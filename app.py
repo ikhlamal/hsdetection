@@ -1,6 +1,7 @@
 import streamlit as st
 import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
+from senti_classifier import senti_classifier
 
 # Load the model and vectorizer
 with open('model.pkl', 'rb') as file:
@@ -12,8 +13,8 @@ with open('vectorizer.pkl', 'rb') as file:
 # Function to predict the sentiment
 def predict_sentiment(tweet):
     text_vectorized = vectorizer.transform([tweet])
-    prediction = classifier.predict(text_vectorized)[0]
-    return prediction
+    pos_score, neg_score = senti_classifier.polarity_scores(text_vectorized)
+    return pos_score, neg_score
 
 def main():
     st.set_page_config(page_title="Hate Speech Detection", page_icon="🗣️")
@@ -25,10 +26,7 @@ def main():
             st.warning("Masukkan tweet terlebih dahulu!")
         else:
             prediction = predict_sentiment(tweet)
-            if prediction == 1:
-                st.success("Hate speech")
-            else:
-                st.success("Bukan hate speech")
+            st.success(prediction)
 
 if __name__ == '__main__':
     main()
